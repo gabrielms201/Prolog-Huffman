@@ -15,11 +15,9 @@ getCodigo(Caracter,Codigo, String):-
     verificaNaArvore(Caracter,Arvore,Codigo).
 
 % Esse predicado relaciona um caractere ao seu codigo.
-verificaNaArvore(_I,[],_Co):-
-    write("ERRO FATAL: Caracter não está na arvore").
 verificaNaArvore(Item,[[_,Item,Code]|_R],Code).
-verificaNaArvore(Item,[[_N,_X,_Cod]|Resto], C):-
-    verificaNaArvore(Item,Resto,C),!.
+verificaNaArvore(Item,[[_N,_X,_Cod]|Cauda], C):- verificaNaArvore(Item,Cauda,C),!.
+verificaNaArvore(_I,[],_Co):- write("ERRO FATAL: Caracter não está na arvore").
 
 % algoritmo de huffman
 huffman(ArvoreCodificada, String):-
@@ -32,10 +30,9 @@ huffman(ArvoreCodificada, String):-
     criarArvore(ParesOrd, Arvore),
     codificarCaracteres(Arvore,[],ArvoreCodificada).
 
-
 % Conta a quantidade de caracteres
 contarQuantidadeCaracter(X,[],[1,X],[]).
-contarQuantidadeCaracter(X,[X|L],[Count,X],Resto):- contarQuantidadeCaracter(X, L, [Contagem2,X],Resto), Count is Contagem2 + 1.
+contarQuantidadeCaracter(X,[X|L],[Count,X],Cauda):- contarQuantidadeCaracter(X, L, [Contagem2,X],Cauda), Count is Contagem2 + 1.
 contarQuantidadeCaracter(X,[Y|L],[1,X],[Y|L]):- dif(X,Y). % Unica ocorrência
 
 % Cria uma lista de dupla de frequencia da caractere ex [(10, "A"), etc)
@@ -45,11 +42,11 @@ calcularFrequencia([Head|Tail], [Dupla|TailDupla]):-
     calcularFrequencia(NovaTail, TailDupla),!.
 
 % Tem como objetivo criar a lista que representa a arvore inteira.
-criarArvore( [[Freq1|Caracter1],[Freq2|Caracter2]|Resto],ArvoreFinal):-
-    Total is Freq1 + Freq2,
-    Arvore = [Total,[Freq1|Caracter1],[Freq2|Caracter2]],
-    ( Resto=[] -> ArvoreFinal = Arvore ; sort([Arvore|Resto], RestoOrdenado),
-    criarArvore(RestoOrdenado,ArvoreFinal) ).
+criarArvore( [[F1|Caracter1],[F2|Caracter2]|Cauda],ArvoreFinal):-
+    Total is F1 + F2,
+    Arvore = [Total,[F1|Caracter1],[F2|Caracter2]],
+    ( Cauda=[] -> ArvoreFinal = Arvore ; sort([Arvore|Cauda], CaudaOrdenada),
+    criarArvore(CaudaOrdenada,ArvoreFinal) ).
 
 % Codifica cada caractere da arvore em binario, e adiciona o codigo ao no. Exemplo: [2,"B",[1,0,1]]
 codificarCaracteres([_,NoEsq,NoDir], Codigo, ListaFinal):-
