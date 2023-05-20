@@ -5,14 +5,7 @@
 
 
 % Predicado principal que devera ser chamado ao testar o programa
-main():- salvarCodigosParaArquivo("Camilo Villalobos Lenguaje y Paradigmas de Programacion", "out.txt").
-
-% Obtem o codigo de um caractere de acordo com a string dada.
-% Esse predicado é a base do nosso codigo
-% Chamamos ele para cada caractere da nossa string, e depois armazenamos numa lista de duplas
-getCodigo(Caracter,Codigo, String):-
-    huffman(Arvore, String),
-    verificaNaArvore(Caracter,Arvore,Codigo).
+main():- salvarCodigosParaArquivo("HelloCo", "out.txt").
 
 % Esse predicado relaciona um caractere ao seu codigo.
 verificaNaArvore(Item,[[_,Item,Code]|_R],Code).
@@ -66,12 +59,19 @@ ehNo([_,_,_]).
 % Codigo = [(H, 111), (E, 110), (L, 101), (O, 011)]
 juntarCodigosEmDuplas(String, Codigo):-
     string_chars(String, List),
-    juntarCodigosEmDuplas_aux(List, Codigo, String).
+    huffman(Arvore, String),
+    juntarCodigosEmDuplas_aux(List, Codigo, String, Arvore).
 
-juntarCodigosEmDuplas_aux([], [], _).
-juntarCodigosEmDuplas_aux([Char | Tail], [(Char, Code) | RestCodes], String):-
-    getCodigo(Char, Code, String),
-    juntarCodigosEmDuplas_aux(Tail, RestCodes, String).
+juntarCodigosEmDuplas_aux([], [], _, Arvore).
+juntarCodigosEmDuplas_aux([Char | Tail], [(Char, Code) | RestCodes], String, Arvore):-
+    getCodigo(Char, Code, String, Arvore),
+    juntarCodigosEmDuplas_aux(Tail, RestCodes, String, Arvore).
+
+% Obtem o codigo de um caractere de acordo com a string dada.
+% Esse predicado é a base do nosso codigo
+% Chamamos ele para cada caractere da nossa string, e depois armazenamos numa lista de duplas
+getCodigo(Caracter,Codigo, String, Arvore):-
+    verificaNaArvore(Caracter,Arvore,Codigo).
 
 % Como percorremos, precisamos inverter o codigo, e transformar em uma string.
 codificarNo([No1, No2], Codigo, CodigoFinal):-
