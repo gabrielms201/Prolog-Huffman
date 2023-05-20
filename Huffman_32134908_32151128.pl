@@ -28,7 +28,7 @@ huffman(ArvoreCodificada, String):-
 
 % Conta a quantidade de caracteres
 contarQuantidadeCaracter(X,[],[1,X],[]).
-contarQuantidadeCaracter(X,[X|L],[Count,X],Cauda):- contarQuantidadeCaracter(X, L, [Contagem2,X],Cauda), Count is Contagem2 + 1.
+contarQuantidadeCaracter(X,[X|L],[C,X],Cauda):- contarQuantidadeCaracter(X, L, [C2,X],Cauda), C is C2 + 1.
 contarQuantidadeCaracter(X,[Y|L],[1,X],[Y|L]):- dif(X,Y). % Unica ocorrência
 
 % Cria uma lista de dupla de frequencia da caractere ex [(10, "A"), etc)
@@ -93,19 +93,16 @@ salvarCodigosParaArquivo(String, Filename) :-
     salvarCodigosParaArquivo_aux(Filtrado, Stream),
     close(Stream).
 
-% salvarCodigosParaArquivo_aux([], _).
-% salvarCodigosParaArquivo_aux([(Char, Code) | RestCodes], Stream) :-
-%     format(Stream, '~w: ~w~n', [Char, Code]),
-%     salvarCodigosParaArquivo_aux(RestCodes, Stream).
+
 salvarCodigosParaArquivo_aux([], _).
-salvarCodigosParaArquivo_aux([(Char, Code) | RestCodes], Stream) :-
+salvarCodigosParaArquivo_aux([(Char, Code) | Cauda], S) :-
     (Char = '\n' ->
         NewChar = '\\n'
     ;
         NewChar = Char
     ),
-    format(Stream, '~w: ~w~n', [NewChar, Code]),
-    salvarCodigosParaArquivo_aux(RestCodes, Stream).
+    format(S, '~w: ~w~n', [NewChar, Code]),
+    salvarCodigosParaArquivo_aux(Cauda, S).
 
 % Remove letras repetidas para o arquivo final ficar mais bonito
 removerDuplasRepetidas(Lista, Resultado) :-
