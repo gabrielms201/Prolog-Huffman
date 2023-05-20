@@ -2,10 +2,13 @@
 % PAULO HENRIQUE BRAGA CECHINEL             - 32151128
 % RICARDO GABRIEL MARQUES DOS SANTOS RUIZ   - 32134908
 % Esse programa consiste em ler um arquivo.txt, codificar em huffman, e depois escrever o seu codigo em um arquivo out.txt
+% obs: para quebras de linha, o output do \n está vazio:
 
 
 % Predicado principal que devera ser chamado ao testar o programa
-main():- salvarCodigosParaArquivo("HelloCo", "out.txt").
+main():- 
+    lerArquivo("in.txt", Content),
+    salvarCodigosParaArquivo(Content, "out.txt").
 
 % Esse predicado relaciona um caractere ao seu codigo.
 verificaNaArvore(Item,[[_,Item,Code]|_R],Code).
@@ -89,7 +92,34 @@ salvarCodigosParaArquivo(String, Filename) :-
     salvarCodigosParaArquivo_aux(Codigo, Stream),
     close(Stream).
 
+% salvarCodigosParaArquivo_aux([], _).
+% salvarCodigosParaArquivo_aux([(Char, Code) | RestCodes], Stream) :-
+%     format(Stream, '~w: ~w~n', [Char, Code]),
+%     salvarCodigosParaArquivo_aux(RestCodes, Stream).
 salvarCodigosParaArquivo_aux([], _).
 salvarCodigosParaArquivo_aux([(Char, Code) | RestCodes], Stream) :-
-    format(Stream, '~w: ~w~n', [Char, Code]),
+    (Char = '\n' ->
+        NewChar = '\\n'
+    ;
+        NewChar = Char
+    ),
+    format(Stream, '~w: ~w~n', [NewChar, Code]),
     salvarCodigosParaArquivo_aux(RestCodes, Stream).
+
+
+
+
+
+lerArquivo(FileName, Content) :-
+    open(FileName, read, Stream),
+    lerLinhas(Stream, Lines),
+    close(Stream),
+    atomic_list_concat(Lines, '\n', Content).
+
+lerLinhas(Stream, []) :-
+    at_end_of_stream(Stream).
+    
+lerLinhas(Stream, [Line | Rest]) :-
+    \+ at_end_of_stream(Stream),
+    read_line_to_string(Stream, Line),
+    lerLinhas(Stream, Rest).
