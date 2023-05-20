@@ -88,8 +88,9 @@ codificarNo([No1, No2], Codigo, CodigoFinal):-
 % Recebe uma string, e salva em um arquivo
 salvarCodigosParaArquivo(String, Filename) :-
     juntarCodigosEmDuplas(String, Codigo),
+    removerDuplasRepetidas(Codigo, Filtrado),
     open(Filename, write, Stream),
-    salvarCodigosParaArquivo_aux(Codigo, Stream),
+    salvarCodigosParaArquivo_aux(Filtrado, Stream),
     close(Stream).
 
 % salvarCodigosParaArquivo_aux([], _).
@@ -106,20 +107,29 @@ salvarCodigosParaArquivo_aux([(Char, Code) | RestCodes], Stream) :-
     format(Stream, '~w: ~w~n', [NewChar, Code]),
     salvarCodigosParaArquivo_aux(RestCodes, Stream).
 
+% Remove letras repetidas para o arquivo final ficar mais bonito
+removerDuplasRepetidas(Lista, Resultado) :-
+    removerDuplasRepetidas(Lista, [], Resultado).
 
+removerDuplasRepetidas([], Acumulador, Acumulador).
+removerDuplasRepetidas([(Char, Code) | Resto], Acumulador, Resultado) :-
+    (member((Char, _), Resto) ->
+        removerDuplasRepetidas(Resto, Acumulador, Resultado)
+    ;
+        append(Acumulador, [(Char, Code)], NovoAcumulador),
+        removerDuplasRepetidas(Resto, NovoAcumulador, Resultado)
+    ).
+% Le um arquivo, e retorna uma string
+lerArquivo(Nome, Output) :-
+    open(Nome, read, S),
+    lerLinhas(S, Lines),
+    close(S),
+    atomic_list_concat(Lines, '\n', Output).
 
+lerLinhas(S, []) :-
+    at_end_of_stream(S).
 
-
-lerArquivo(FileName, Content) :-
-    open(FileName, read, Stream),
-    lerLinhas(Stream, Lines),
-    close(Stream),
-    atomic_list_concat(Lines, '\n', Content).
-
-lerLinhas(Stream, []) :-
-    at_end_of_stream(Stream).
-    
-lerLinhas(Stream, [Line | Rest]) :-
-    \+ at_end_of_stream(Stream),
-    read_line_to_string(Stream, Line),
-    lerLinhas(Stream, Rest).
+lerLinhas(S, [X | Z]) :-
+    \+ at_end_of_stream(S),
+    read_line_to_string(S, X),
+    lerLinhas(S, Z).
