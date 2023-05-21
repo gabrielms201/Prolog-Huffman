@@ -65,16 +65,15 @@ juntarCodigosEmDuplas(String, Codigo):-
     huffman(Arvore, String),
     juntarCodigosEmDuplas_aux(List, Codigo, String, Arvore).
 
+
 juntarCodigosEmDuplas_aux([], [], _, Arvore).
 juntarCodigosEmDuplas_aux([Char | Tail], [(Char, Code) | RestCodes], String, Arvore):-
-    getCodigo(Char, Code, String, Arvore),
+    % Obtem o codigo de um caractere de acordo com a string dada.
+    % Esse predicado é a base do nosso codigo
+    % Chamamos ele para cada caractere da nossa string, e depois armazenamos numa lista de duplas
+    verificaNaArvore(Char,Arvore,Code),
     juntarCodigosEmDuplas_aux(Tail, RestCodes, String, Arvore).
 
-% Obtem o codigo de um caractere de acordo com a string dada.
-% Esse predicado é a base do nosso codigo
-% Chamamos ele para cada caractere da nossa string, e depois armazenamos numa lista de duplas
-getCodigo(Caracter,Codigo, String, Arvore):-
-    verificaNaArvore(Caracter,Arvore,Codigo).
 
 % Como percorremos, precisamos inverter o codigo, e transformar em uma string.
 codificarNo([No1, No2], Codigo, CodigoFinal):-
@@ -83,8 +82,6 @@ codificarNo([No1, No2], Codigo, CodigoFinal):-
     CodigoFinal = [[No1, No2, CodigoEmString]].
 
 % Predicados para tratamento de arquivos:
-
-
 % Recebe uma string, e salva em um arquivo
 salvarCodigosParaArquivo(String, Filename) :-
     juntarCodigosEmDuplas(String, Codigo),
